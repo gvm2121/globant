@@ -1,0 +1,17 @@
+SELECT
+  d.name    AS department,
+  j.title   AS job,
+  COUNT(*) FILTER (WHERE EXTRACT(QUARTER FROM e.hire_date) = 1) AS Q1,
+  COUNT(*) FILTER (WHERE EXTRACT(QUARTER FROM e.hire_date) = 2) AS Q2,
+  COUNT(*) FILTER (WHERE EXTRACT(QUARTER FROM e.hire_date) = 3) AS Q3,
+  COUNT(*) FILTER (WHERE EXTRACT(QUARTER FROM e.hire_date) = 4) AS Q4
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+JOIN jobs        j ON e.job_id        = j.id
+WHERE EXTRACT(YEAR FROM e.hire_date) = 2021
+GROUP BY
+  d.name,
+  j.title
+ORDER BY
+  d.name ASC,
+  j.title ASC;

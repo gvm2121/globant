@@ -1,0 +1,22 @@
+WITH hires_per_dept AS (
+  SELECT
+    department_id,
+    COUNT(*) AS hired_count
+  FROM employees
+  WHERE EXTRACT(YEAR FROM hire_date) = 2021
+  GROUP BY department_id
+),
+avg_hires AS (
+  SELECT AVG(hired_count) AS avg_hired
+  FROM hires_per_dept
+)
+SELECT
+  d.id,
+  d.name,
+  h.hired_count
+FROM hires_per_dept h
+JOIN departments d 
+  ON d.id = h.department_id
+CROSS JOIN avg_hires a
+WHERE h.hired_count > a.avg_hired
+ORDER BY h.hired_count DESC;

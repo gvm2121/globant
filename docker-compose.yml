@@ -1,0 +1,33 @@
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: globant_user
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: globant_db
+    ports:
+      - "5433:5432" #ojo que acá se cambia el puerto
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U globant_user -d globant_db"]
+      interval: 5s
+      retries: 5
+  
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Le decimos a la app que use el host 'db' en vez de localhost
+      DATABASE_URL: "postgresql://globant_user:1234@db:5432/globant_db"
+    ports:
+      - "8000:8000"
+
+volumes:
+    pgdata:
